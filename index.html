@@ -1,739 +1,2276 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Invila™ | Integrated Strategic Dashboard</title>
-    
-    <!-- CDNs -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- PDF Engine -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="color-scheme" content="light" />
+  <title>Invila™ | Integrated Strategic Dashboard</title>
 
-    <style>
-        :root { 
-            --navy: #0f172a; 
-            --blue-p: #2563eb; 
-            --cyan-p: #06b6d4;
-            --gradiant-blue: #0066ff;
-            --gradiant-green: #10b981;
-            --gradiant-indigo: #6366f1;
-        }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            scroll-behavior: smooth; 
-            overflow-x: hidden; 
-            background: #fff; 
-        }
-        .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        /* Reveal Animation Logic */
-        .reveal { opacity: 0; transform: translateY(20px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        
-        .safe-container { @apply max-w-7xl mx-auto px-6 sm:px-10 md:px-12 lg:px-16; }
+  <!-- Optional fonts (Google). Remove if you need a fully offline file. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 
-        /* --- LOGO PILL SYSTEM --- */
-        .logo-pill {
-            min-height: 58px;
-            padding: 10px 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #f1f5f9;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-            width: fit-content;
-            min-width: 120px;
-        }
-        
-        /* Marquee Seamless Logic */
-        .marquee-wrapper { overflow: hidden; display: flex; width: 100%; position: relative; padding: 20px 0; }
-        @keyframes scroll-marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .marquee-content { 
-            display: flex; 
-            width: max-content; 
-            animation: scroll-marquee 40s linear infinite; 
-            align-items: center;
-        }
-        .marquee-content:hover { animation-play-state: paused; }
-        .marquee-content .logo-pill { margin-right: 24px; }
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-        .logo-pill img {
-            max-height: 34px;
-            max-width: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            filter: grayscale(100%);
-            opacity: 0.6;
-            transition: all 0.4s ease;
-        }
-        .logo-pill:hover img { filter: grayscale(0%); opacity: 1; }
+  <!-- PDF Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        /* LOGO WALL GRID (1.5X SIZE) */
-        .logo-wall-grid .logo-pill {
-            min-height: 87px; 
-            padding: 15px 21px;
-            min-width: 180px;
-        }
-        .logo-wall-grid .logo-pill img { max-height: 51px; filter: grayscale(0%); opacity: 1; }
-        .logo-wall-grid .pill-label { font-size: 10px; margin-top: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+  <style>
+    /*
+      PRODUCTION FIX: The original file used Tailwind directives like @apply inside a normal <style> tag.
+      Browsers do not understand Tailwind build-time directives. This rewrite replaces them with plain CSS.
 
-        /* --- ECCENTRIC ANIMATION --- */
-        @keyframes rotate-eccentric {
-            0% { transform: rotate(0deg) translate(15%, 0) rotate(0deg); }
-            100% { transform: rotate(360deg) translate(15%, 0) rotate(-360deg); }
-        }
-        .animated-circle { position: absolute; border-radius: 50%; pointer-events: none; border-width: 2px !important; }
-        .circle-1 { width: 180px; height: 180px; border: 2px solid var(--gradiant-blue); animation: rotate-eccentric 10s linear infinite; }
-        .circle-2 { width: 210px; height: 210px; border: 2px dashed var(--gradiant-green); animation: rotate-eccentric 12s linear infinite reverse; }
-        .circle-3 { width: 240px; height: 240px; border: 2px solid var(--gradiant-indigo); animation: rotate-eccentric 15s linear infinite; }
+      ACCESSIBILITY FIXES:
+      - Tokenized colors for consistent contrast and background/surface hierarchy.
+      - Skip link for WCAG 2.4.1 Bypass Blocks.
+      - Strong :focus-visible styling for WCAG 2.4.7 Focus Visible.
+      - Marquee pause/resume control, plus prefers-reduced-motion adaptations.
+      - Readable line length using ch-based measure.
+    */
 
-        @media (min-width: 768px) {
-            .circle-1 { width: 250px; height: 250px; }
-            .circle-2 { width: 290px; height: 290px; }
-            .circle-3 { width: 330px; height: 330px; }
-        }
+    :root{
+      /* Background & surfaces */
+      --canvas: #f8fafc;     /* page background */
+      --surface: #ffffff;    /* cards, nav */
+      --surface-2: #f1f5f9;  /* muted blocks */
 
-        /* CYCLING TEXT */
-        @keyframes text-appearance {
-            0%, 25% { opacity: 0; transform: scale(0.9) translateY(10px); }
-            33%, 58% { opacity: 1; transform: scale(1) translateY(0); }
-            66%, 100% { opacity: 0; transform: scale(1.05) translateY(-10px); }
-        }
-        .cycle-text {
-            position: absolute; opacity: 0; animation: text-appearance 9s infinite;
-            @apply font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] whitespace-nowrap text-xs md:text-xl text-center;
-        }
-        .text-efficiency { animation-delay: 0s; color: var(--gradiant-blue); }
-        .text-resilience { animation-delay: 3s; color: var(--gradiant-indigo); }
-        .text-sustainability { animation-delay: 6s; color: var(--gradiant-green); }
+      /* Text (conservative/high-contrast defaults) */
+      --text: #0f172a;       /* slate-900 */
+      --text-muted: #334155; /* slate-700 (safer than lighter grays for WCAG) */
+      --text-subtle: #475569;/* slate-600 */
+      --text-invert: #ffffff;
 
-        .stat-circle {
-            @apply w-[130px] h-[130px] sm:w-[150px] sm:h-[150px] md:w-[185px] md:h-[185px] rounded-full flex flex-col items-center justify-center text-center border border-black/5 bg-white shadow-sm;
-        }
+      /* Brand accents (assumed; conservative accessible tones) */
+      --primary: #2563eb;    /* blue-600 */
+      --accent: #06b6d4;     /* cyan-500 */
+      --indigo: #6366f1;
+      --emerald: #10b981;
+      --rose: #f43f5e;
 
-        /* --- DASHBOARD STYLES --- */
-        .stat-box { border: 2.5px solid #000; background: #0f172a; }
-        .card-industrial { 
-            border: 2px solid #000; 
-            transition: all 0.2s ease; 
-        }
-        .card-industrial:hover { 
-            border-color: #2563eb;
-            background-color: #f8fafc;
-        }
+      /* Dark section */
+      --dark: #020617;       /* near-slate-950 */
+      --dark-2: rgba(2, 6, 23, 0.85);
+      --dark-text: #e2e8f0;
+      --dark-muted: #94a3b8;
 
-        .glass-panel { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .risk-item { @apply flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
+      /* Borders/shadows */
+      --border: rgba(15, 23, 42, 0.12);
+      --border-strong: rgba(15, 23, 42, 0.18);
+      --shadow-sm: 0 1px 2px rgba(2,6,23,0.06);
+      --shadow-md: 0 12px 30px rgba(2,6,23,0.10);
+      --shadow-lg: 0 26px 70px rgba(2,6,23,0.20);
+
+      /* Layout */
+      --container: 1200px;
+      --radius-xl: 28px;
+      --radius-2xl: 44px;
+
+      /* Typography */
+      --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --font-display: "Plus Jakarta Sans", var(--font-sans);
+      --measure: 65ch; /* readable line length target */
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: var(--font-sans);
+      color: var(--text);
+      background: var(--canvas);
+      overflow-x: hidden;
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth; /* overridden in reduced motion */
+    }
+
+    /* Reduced motion: disable smooth scrolling and non-essential animations. */
+    @media (prefers-reduced-motion: reduce){
+      body{ scroll-behavior: auto; }
+      *{
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    /* Skip link (WCAG 2.4.1) */
+    .skip-link{
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 1000;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      color: var(--text);
+      text-decoration: none;
+      transform: translateY(-140%);
+      transition: transform 0.2s ease;
+    }
+    .skip-link:focus{ transform: translateY(0); }
+    .skip-link:focus-visible{ outline: 3px solid rgba(37,99,235,0.35); outline-offset: 2px; }
+
+    /* Focus visibility (WCAG 2.4.7; :focus-visible best practice) */
+    :focus-visible{
+      outline: 3px solid rgba(37,99,235,0.45);
+      outline-offset: 3px;
+    }
+
+    /* Container */
+    .container{
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    @media (min-width: 768px){
+      .container{ padding: 0 32px; }
+    }
+    @media (min-width: 1024px){
+      .container{ padding: 0 40px; }
+    }
+
+    /* Utilities */
+    .muted{ color: var(--text-muted); }
+    .subtle{ color: var(--text-subtle); }
+    .measure{ max-width: var(--measure); }
+    .sr-only{
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    /* Header / Nav */
+    .header{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      gap: 16px;
+    }
+    @media (min-width: 768px){
+      .nav{ padding: 18px 0; }
+    }
+    .brand{
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      line-height: 1;
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 2px;
+      font-size: 20px;
+    }
+    @media (min-width: 768px){
+      .brand{ font-size: 24px; }
+    }
+    .brand sup{
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 800;
+      line-height: 1;
+      margin-left: 2px;
+    }
+
+    .nav-links{
+      display: none;
+      gap: 26px;
+      align-items: center;
+    }
+    .nav-links a{
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.28em;
+      color: var(--text-subtle);
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+    .nav-links a:hover{
+      color: var(--primary);
+      background: rgba(37,99,235,0.08);
+    }
+
+    .nav-toggle{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+    }
+    .nav-panel{
+      display: none;
+      padding: 12px 0 18px;
+    }
+    .nav-panel a{
+      display: block;
+      padding: 12px 14px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 11px;
+      border: 1px solid transparent;
+    }
+    .nav-panel a:hover{
+      border-color: var(--border);
+      background: var(--surface-2);
+      color: var(--primary);
+    }
+
+    @media (min-width: 768px){
+      .nav-toggle, .nav-panel{ display: none !important; }
+      .nav-links{ display: inline-flex; }
+    }
+
+    /* Main offset due to fixed header */
+    main{ padding-top: 84px; }
+    @media (min-width: 768px){ main{ padding-top: 96px; } }
+
+    /* Section spacing */
+    .section{
+      padding: 72px 0;
+      background: transparent;
+    }
+    @media (min-width: 768px){
+      .section{ padding: 96px 0; }
+    }
+
+    /* Hero */
+    .hero{
+      background: linear-gradient(180deg, var(--surface) 0%, var(--canvas) 100%);
+      padding-top: 36px;
+      padding-bottom: 36px;
+    }
+    .hero-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+    @media (min-width: 1024px){
+      .hero-grid{
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 56px;
+      }
+    }
+
+    .badge{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(37,99,235,0.08);
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+    }
+
+    .hero h1{
+      font-size: clamp(34px, 4.2vw, 76px);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      margin: 18px 0 18px;
+      font-weight: 900;
+      font-style: italic;
+    }
+    .hero h1 .accent{ color: var(--primary); }
+
+    .hero-intro{
+      border-left: 2px solid rgba(15,23,42,0.14);
+      padding-left: 14px;
+      margin: 18px 0 16px;
+      font-style: italic;
+      color: var(--text-muted);
+      max-width: var(--measure);
+      font-size: 18px;
+    }
+
+    .risk-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin: 18px 0 20px;
+    }
+    @media (min-width: 640px){
+      .risk-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .risk-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+    .risk-item svg{ color: var(--primary); }
+
+    .hero-card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      padding: 22px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hero-card:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .hero-card .kicker{
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+    }
+    .hero-card p{
+      margin: 10px 0 0;
+      color: var(--text-muted);
+      max-width: var(--measure);
+    }
+    .pill-row{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 10px;
+    }
+    .mini-pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 10px;
+      color: var(--text-subtle);
+    }
+
+    .media-frame{
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      position: relative;
+      background: #0b1220;
+      border: 8px solid rgba(255,255,255,0.95);
+      box-shadow: var(--shadow-lg);
+      aspect-ratio: 16 / 9;
+    }
+    .media-frame video,
+    .media-frame img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.82;
+    }
+    .media-live{
+      position: absolute;
+      left: 18px;
+      bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(2,6,23,0.45);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 10px;
+      backdrop-filter: blur(10px);
+    }
+    .dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--emerald);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.25);
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); opacity: 0.9; }
+      50%{ transform: scale(1.2); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .dot{ animation: none; }
+    }
+
+    /* Marquee (with pause control, keyboard accessible) */
+    .marquee-wrap{
+      margin-top: 44px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(241,245,249,0.65);
+      padding: 18px 0;
+    }
+    .marquee-head{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+    .marquee-title{
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin: 0;
+    }
+    .marquee-toggle{
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+    .marquee{
+      overflow: hidden;
+      width: 100%;
+    }
+    .marquee-track{
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      width: max-content;
+      animation: marquee-scroll 40s linear infinite;
+      will-change: transform;
+      padding: 14px 0;
+    }
+    @keyframes marquee-scroll{
+      0%{ transform: translateX(0); }
+      100%{ transform: translateX(-50%); }
+    }
+    .marquee[data-paused="true"] .marquee-track{ animation-play-state: paused; }
+
+    /* Prefer-reduced-motion: stop marquee by default */
+    @media (prefers-reduced-motion: reduce){
+      .marquee-track{ animation: none; }
+    }
+
+    /* Logo pill */
+    .logo-pill{
+      min-height: 58px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      min-width: 120px;
+    }
+    .logo-pill img{
+      max-height: 34px;
+      max-width: 120px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      filter: grayscale(100%);
+      opacity: 0.65;
+      transition: filter 0.25s ease, opacity 0.25s ease;
+    }
+    .logo-pill:hover img{ filter: grayscale(0%); opacity: 1; }
+    .pill-label{
+      margin-top: 8px;
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--text-subtle);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    /* Reveal */
+    .reveal{
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.is-visible{
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce){
+      .reveal{ opacity: 1; transform: none; transition: none; }
+    }
+
+    /* DNA section */
+    .dna-head h2{
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.34em;
+      font-size: 12px;
+    }
+    .dna-head h3{
+      margin: 0;
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      font-size: clamp(28px, 3.6vw, 58px);
+    }
+
+    .dna-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      align-items: center;
+      margin-top: 40px;
+    }
+    @media (min-width: 1024px){
+      .dna-grid{
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 56px;
+      }
+    }
+
+    .orbital{
+      position: relative;
+      height: 420px;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+    @media (min-width: 768px){ .orbital{ height: 520px; } }
+
+    .circle{
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+      border-width: 2px;
+      border-style: solid;
+      opacity: 0.95;
+    }
+    .circle.one{
+      width: 220px;
+      height: 220px;
+      border-color: var(--primary);
+      animation: orbit 10s linear infinite;
+      transform-origin: center;
+    }
+    .circle.two{
+      width: 260px;
+      height: 260px;
+      border-color: var(--emerald);
+      border-style: dashed;
+      animation: orbit 12s linear infinite reverse;
+    }
+    .circle.three{
+      width: 300px;
+      height: 300px;
+      border-color: var(--indigo);
+      animation: orbit 15s linear infinite;
+    }
+    @media (min-width: 768px){
+      .circle.one{ width: 280px; height: 280px; }
+      .circle.two{ width: 330px; height: 330px; }
+      .circle.three{ width: 380px; height: 380px; }
+    }
+    @keyframes orbit{
+      0%{ transform: rotate(0deg) translate(14%, 0) rotate(0deg); }
+      100%{ transform: rotate(360deg) translate(14%, 0) rotate(-360deg); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .circle{ animation: none; }
+    }
+
+    .cycle{
+      position: absolute;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.28em;
+      font-size: 12px;
+      opacity: 0;
+      animation: cycle 9s infinite;
+      text-align: center;
+      width: 100%;
+      padding: 0 16px;
+    }
+    @media (min-width: 768px){
+      .cycle{ font-size: 22px; letter-spacing: 0.32em; }
+    }
+    .cycle.eff{ color: var(--primary); animation-delay: 0s; }
+    .cycle.res{ color: var(--indigo); animation-delay: 3s; }
+    .cycle.sus{ color: var(--emerald); animation-delay: 6s; }
+
+    @keyframes cycle{
+      0%, 25%{ opacity: 0; transform: translateY(10px) scale(0.95); }
+      33%, 58%{ opacity: 1; transform: translateY(0) scale(1); }
+      66%, 100%{ opacity: 0; transform: translateY(-10px) scale(1.03); }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .cycle{ animation: none; opacity: 1; transform: none; position: static; }
+      .orbital{ height: auto; padding: 24px 0; }
+    }
+
+    .dna-features{
+      display: grid;
+      gap: 18px;
+    }
+    .feature{
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .feature-icon{
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      background: rgba(37,99,235,0.08);
+      color: var(--primary);
+      flex: 0 0 auto;
+      box-shadow: var(--shadow-sm);
+    }
+    .feature:nth-child(2) .feature-icon{
+      color: var(--indigo);
+      background: rgba(99,102,241,0.10);
+    }
+    .feature:nth-child(3) .feature-icon{
+      color: var(--emerald);
+      background: rgba(16,185,129,0.10);
+    }
+    .feature h4{
+      margin: 0;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      font-style: italic;
+      font-size: 20px;
+    }
+    .feature p{
+      margin: 6px 0 0;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .stats-row{
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      justify-content: center;
+    }
+    .stat-circle{
+      width: 150px;
+      height: 150px;
+      border-radius: 999px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+      padding: 12px;
+    }
+    @media (min-width: 768px){
+      .stat-circle{ width: 190px; height: 190px; }
+    }
+    .stat-circle .big{
+      font-size: 46px;
+      font-weight: 900;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--primary);
+    }
+    .stat-circle .label{
+      margin-top: 10px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--text-subtle);
+    }
+    .stat-circle.primary{
+      background: var(--primary);
+      border-color: rgba(37,99,235,0.35);
+      color: #fff;
+    }
+    .stat-circle.primary .big{ color: #fff; }
+    .stat-circle.primary .label{ color: rgba(255,255,255,0.85); }
+    .stat-circle.dark{
+      background: #0f172a;
+      border-color: rgba(255,255,255,0.10);
+      color: #fff;
+    }
+    .stat-circle.dark .big{ color: var(--accent); }
+    .stat-circle.dark .label{ color: rgba(255,255,255,0.75); }
+
+    /* Audit / calculator section */
+    .audit{
+      background: var(--dark);
+      color: var(--dark-text);
+    }
+    .audit h3{
+      font-family: var(--font-display);
+      margin: 0;
+      font-size: clamp(22px, 2.4vw, 34px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .audit h3 span{
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .audit-actions{
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    @media (min-width: 640px){
+      .audit-actions{ flex-direction: row; }
+    }
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 18px;
+      border-radius: 22px;
+      border: 1px solid transparent;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      user-select: none;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{
+      background: var(--rose);
+      color: #fff;
+      box-shadow: 0 20px 50px rgba(244,63,94,0.25);
+    }
+    .btn-primary:hover{ background: #e11d48; }
+    .btn-ghost{
+      background: rgba(148,163,184,0.10);
+      color: rgba(148,163,184,0.85);
+      border-color: rgba(148,163,184,0.15);
+      cursor: not-allowed;
+    }
+    .btn-update{
+      background: rgba(6,182,212,0.92);
+      color: #001018;
+      border-color: rgba(6,182,212,0.20);
+      cursor: pointer;
+    }
+
+    .audit-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 28px;
+    }
+    @media (min-width: 1024px){
+      .audit-grid{
+        grid-template-columns: 440px 1fr;
+        gap: 44px;
+        align-items: start;
+      }
+    }
+
+    .glass{
+      background: rgba(15,23,42,0.68);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 40px;
+      padding: 26px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 54px rgba(0,0,0,0.25);
+    }
+    @media (min-width: 768px){
+      .glass{ padding: 34px; border-radius: 52px; }
+    }
+
+    .panel-head{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .panel-badge{
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(6,182,212,0.90);
+      color: #001018;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 40px rgba(6,182,212,0.18);
+    }
+    .panel-title{
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.26em;
+      font-size: 11px;
+      margin: 0;
+    }
+    .field{
+      display: grid;
+      gap: 6px;
+      margin-top: 14px;
+    }
+    .field label{
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--dark-muted);
+    }
+    .field input{
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--dark-text);
+      font-weight: 900;
+      font-size: 34px;
+      letter-spacing: -0.02em;
+      outline: none;
+    }
+    .field input:focus-visible{
+      outline: 3px solid rgba(6,182,212,0.35);
+      outline-offset: 3px;
+    }
+    .field input.accent{ color: var(--accent); }
+
+    .outputs{
+      display: grid;
+      gap: 16px;
+    }
+    .saving{
+      border-radius: 56px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: radial-gradient(700px 400px at 80% 0%, rgba(37,99,235,0.14), transparent 55%),
+                  linear-gradient(135deg, rgba(15,23,42,0.9), rgba(0,0,0,0.92));
+      box-shadow: 0 30px 90px rgba(0,0,0,0.40);
+      overflow: hidden;
+      position: relative;
+    }
+    @media (min-width: 768px){
+      .saving{ padding: 44px; }
+    }
+    .saving .kicker{
+      color: rgba(96,165,250,0.95);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.42em;
+      font-size: 12px;
+    }
+    .saving .value{
+      margin: 14px 0 0;
+      font-size: clamp(42px, 5vw, 92px);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      font-style: italic;
+      line-height: 1;
+    }
+    .mini-boxes{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px){
+      .mini-boxes{ grid-template-columns: 1fr 1fr; }
+    }
+    .mini{
+      border-radius: 30px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(15,23,42,0.65);
+      backdrop-filter: blur(10px);
+    }
+    .mini .label{
+      margin: 0 0 6px;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--dark-muted);
+    }
+    .mini .num{
+      margin: 0;
+      font-weight: 900;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--dark-text);
+    }
+    .mini.rose{
+      border-color: rgba(244,63,94,0.22);
+    }
+    .mini.rose .num{ color: rgba(251,113,133,0.96); }
+
+    .capex{
+      border-radius: 56px;
+      padding: 26px;
+      border: 1px solid rgba(6,182,212,0.25);
+      background: radial-gradient(800px 500px at 0% 0%, rgba(6,182,212,0.18), transparent 60%),
+                  rgba(15,23,42,0.72);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.40);
+    }
+    @media (min-width: 768px){
+      .capex{ padding: 34px; }
+    }
+    .capex .top{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .capex .top span{
+      color: rgba(34,211,238,0.95);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.34em;
+      font-size: 12px;
+    }
+    .capex p{
+      margin: 10px 0 14px;
+      color: rgba(148,163,184,0.95);
+      font-size: 14px;
+      max-width: 70ch;
+    }
+    .capex .capex-value{
+      margin: 0;
+      font-size: clamp(36px, 4.2vw, 72px);
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: #fff;
+    }
+    .capex .capex-footer{
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--dark-muted);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.20em;
+      font-size: 10px;
+    }
+    .status{
+      color: rgba(34,211,238,0.95);
+    }
+
+    /* Portfolio */
+    .portfolio{
+      background: var(--surface-2);
+      border-top: 1px solid var(--border);
+    }
+    .stat-box{
+      background: #0f172a;
+      border: 2px solid rgba(2,6,23,0.80);
+      border-radius: 26px;
+      color: #fff;
+      padding: 18px;
+      box-shadow: var(--shadow-lg);
+    }
+    @media (min-width: 768px){
+      .stat-box{ padding: 24px; }
+    }
+    .stat-box-row{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .stat-box-title{
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding-right: 18px;
+      border-right: 1px solid rgba(148,163,184,0.25);
+    }
+    @media (min-width: 768px){
+      .stat-box-title{ display: inline-flex; }
+    }
+    .stat-box-title p{
+      margin: 0;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      font-size: 12px;
+    }
+    .stat-metrics{
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    @media (min-width: 768px){
+      .stat-metrics{
+        justify-content: flex-end;
+        width: auto;
+        gap: 32px;
+      }
+    }
+    .metric{
+      min-width: 160px;
+      text-align: center;
+    }
+    @media (min-width: 768px){
+      .metric{ text-align: left; }
+    }
+    .metric .label{
+      margin: 0;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: rgba(148,163,184,0.82);
+    }
+    .metric .val{
+      margin: 6px 0 0;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      font-size: 40px;
+      line-height: 1;
+    }
+    .metric .unit{
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0.55;
+      margin-left: 6px;
+    }
+    .metric.emerald .val{ color: rgba(52,211,153,0.95); }
+
+    .portfolio-head{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 26px;
+    }
+    .portfolio-head h2{
+      margin: 0;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.36em;
+    }
+    .divider{
+      height: 2px;
+      background: rgba(15,23,42,0.10);
+      flex: 1 1 auto;
+      border-radius: 999px;
+    }
+    .icon-btn{
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.70);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: var(--text-subtle);
+    }
+    .icon-btn:hover{
+      background: #fff;
+      color: var(--primary);
+      border-color: rgba(37,99,235,0.22);
+    }
+
+    .projects{
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 768px){
+      .projects{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (min-width: 1024px){
+      .projects{ grid-template-columns: 1fr 1fr 1fr; }
+    }
+    .project{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    }
+    .project:hover{
+      border-color: rgba(37,99,235,0.35);
+      background: rgba(248,250,252,0.9);
+      transform: translateY(-2px);
+    }
+    .project-top{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .badge-mini{
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(15,23,42,0.10);
+      background: rgba(148,163,184,0.12);
+      color: var(--text-subtle);
+    }
+    .badge-mini.zero{ background: rgba(99,102,241,0.92); color: #fff; border-color: rgba(99,102,241,0.22); }
+    .badge-mini.up{ background: rgba(37,99,235,0.10); color: #1d4ed8; border-color: rgba(37,99,235,0.18); }
+    .badge-mini.new{ background: rgba(16,185,129,0.12); color: #047857; border-color: rgba(16,185,129,0.20); }
+
+    .est{
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(71,85,105,0.9);
+    }
+    .project h3{
+      margin: 0 0 10px;
+      font-size: 14px;
+      line-height: 1.25;
+      font-weight: 900;
+      color: var(--text);
+      min-height: 36px;
+    }
+    .thumb{
+      border: 1px solid rgba(15,23,42,0.10);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(241,245,249,0.9);
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .thumb img{
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .thumb img.is-loaded{ opacity: 1; }
+    .thumb-fallback{
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      text-align: center;
+      padding: 16px;
+      color: rgba(71,85,105,0.9);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .project-meta{
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(15,23,42,0.08);
+      display: grid;
+      gap: 6px;
+    }
+    .meta-row{
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .meta-row strong{
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    /* Stories */
+    .stories{
+      background: var(--surface);
+    }
+    .center{
+      text-align: center;
+    }
+    .stories h2{
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.44em;
+      font-size: 12px;
+    }
+    .stories h3{
+      margin: 0;
+      font-size: clamp(30px, 4vw, 72px);
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.04em;
+    }
+    .story-grid{
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (min-width: 768px){
+      .story-grid{
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+    }
+    .story{
+      border-radius: 44px;
+      overflow: hidden;
+      background: rgba(241,245,249,0.9);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+    }
+    .story video{
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      aspect-ratio: 16 / 10;
+    }
+    .story h5{
+      margin: 14px 18px 18px;
+      font-size: 22px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      font-style: italic;
+      color: var(--text);
+    }
+
+    /* Ecosystem */
+    .ecosystem{
+      background: rgba(241,245,249,0.65);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .eco-head h2{
+      margin: 0 0 10px;
+      color: var(--primary);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.44em;
+      font-size: 12px;
+    }
+    .eco-head h3{
+      margin: 0;
+      font-size: clamp(26px, 3.2vw, 48px);
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.03em;
+    }
+
+    .logo-wall{
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      justify-items: center;
+    }
+    @media (min-width: 640px){
+      .logo-wall{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px){
+      .logo-wall{ grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+    }
+    .logo-wall .logo-pill{
+      min-height: 88px;
+      min-width: 180px;
+      padding: 14px 18px;
+    }
+    .logo-wall .logo-pill img{
+      max-height: 52px;
+      filter: grayscale(0%);
+      opacity: 1;
+    }
+
+    /* Footer */
+    .footer{
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 72px 0;
+    }
+    .footer .brandline{
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      font-size: 30px;
+      font-style: italic;
+      margin: 0 0 14px;
+    }
+    .footer p{
+      margin: 8px 0;
+      color: var(--text-subtle);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.34em;
+      font-size: 11px;
+    }
+    .footer .note{
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: none;
+      font-style: italic;
+      color: var(--text-muted);
+      max-width: 70ch;
+      margin: 12px auto 0;
+      font-size: 12px;
+    }
+
+    /* Scrollbar (non-essential) */
+    ::-webkit-scrollbar{ width: 10px; }
+    ::-webkit-scrollbar-thumb{ background: rgba(100,116,139,0.55); border-radius: 999px; }
+
+    /* scroll-margin for anchor sections so nav doesn't cover headings */
+    section[id]{ scroll-margin-top: 110px; }
+  </style>
 </head>
-<body class="text-slate-900">
 
-    <!-- NAVIGATION -->
-    <nav class="fixed w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
-        <div class="safe-container py-4 md:py-5 flex justify-between items-center">
-            <a href="#" class="text-xl md:text-2xl font-[900] tracking-tighter text-slate-900 flex items-start uppercase leading-none">
-                INVILA<span class="text-blue-600 text-[10px] font-bold ml-0.5" style="vertical-align: super; line-height: 1;">TM</span>
-            </a>
-            <div class="hidden md:flex space-x-12 text-[10px] font-bold uppercase tracking-[0.25em] text-slate-500">
-                <a href="#drives-us" class="hover:text-blue-600 transition-all">Economics</a>
-                <a href="#audit" class="hover:text-blue-600 transition-all">Audit</a>
-                <a href="#portfolio" class="hover:text-blue-600 transition-all">Portfolio</a>
-                <a href="#success-stories" class="hover:text-blue-600 transition-all">Stories</a>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <!-- Header / Navigation -->
+  <header class="header" role="banner">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#" aria-label="Invila home">
+          INVILA<sup aria-hidden="true">TM</sup>
+        </a>
+
+        <nav aria-label="Primary navigation">
+          <!-- Desktop links -->
+          <div class="nav-links" id="primaryNavDesktop">
+            <a href="#drives-us">Economics</a>
+            <a href="#audit">Audit</a>
+            <a href="#portfolio">Portfolio</a>
+            <a href="#success-stories">Stories</a>
+          </div>
+
+          <!-- Mobile toggle -->
+          <button
+            class="nav-toggle"
+            id="navToggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="primaryNavMobile"
+          >
+            <i data-lucide="menu" aria-hidden="true"></i>
+            Menu
+          </button>
+        </nav>
+      </div>
+
+      <!-- Mobile panel -->
+      <div class="nav-panel" id="primaryNavMobile" hidden>
+        <a href="#drives-us">Economics</a>
+        <a href="#audit">Audit</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#success-stories">Stories</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="section hero" aria-label="Hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="reveal">
+            <div class="badge">Water-as-a-Service (WaaS) Model</div>
+
+            <h1>
+              Mengubah Air Limbah Menjadi
+              <span class="accent">Nilai Strategis.</span>
+            </h1>
+
+            <p class="hero-intro">
+              Air kini bertransformasi dari sekadar utilitas menjadi
+              <strong style="color: var(--text);">risiko finansial yang mengancam margin</strong>
+              bisnis Anda:
+            </p>
+
+            <div class="risk-grid" role="list">
+              <div class="risk-item" role="listitem"><i data-lucide="droplets" aria-hidden="true"></i> Kualitas Baku Tidak Pasti</div>
+              <div class="risk-item" role="listitem"><i data-lucide="trending-up" aria-hidden="true"></i> Kenaikan Tarif PDAM</div>
+              <div class="risk-item" role="listitem"><i data-lucide="gauge" aria-hidden="true"></i> Pemangkasan Kuota ABT</div>
+              <div class="risk-item" role="listitem"><i data-lucide="alert-circle" aria-hidden="true"></i> Beban Tarif Limbah WWTP</div>
             </div>
-        </div>
-    </nav>
 
-    <!-- HERO SECTION -->
-    <section class="pt-32 md:pt-48 pb-12 md:pb-16 bg-white relative overflow-hidden">
-        <div class="safe-container relative z-10">
-            <div class="grid lg:grid-cols-2 gap-12 md:gap-20 items-center">
-                <div class="reveal active">
-                    <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest leading-none">
-                        Water-as-a-Service (WaaS) Model
-                    </div>
-                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-[900] text-slate-900 leading-[1.1] tracking-tighter mb-10 italic">
-                        Mengubah Air Limbah Menjadi <span class="text-blue-600">Nilai Strategis.</span>
-                    </h1>
+            <div class="hero-card">
+              <div class="kicker">Zero-CapEx Solution</div>
+              <p class="measure" style="margin-top: 10px;">
+                Kebutuhan air industri menjadi layanan terukur dan ringan secara finansial—
+                <strong style="color: var(--primary);">melindungi arus kas Anda.</strong>
+              </p>
 
-                    <div class="space-y-8 mb-10">
-                        <p class="text-slate-500 text-lg leading-relaxed border-l-2 border-slate-200 pl-4 italic">
-                            Air kini bertransformasi dari sekadar utilitas menjadi <span class="text-slate-900 font-bold">risiko finansial yang mengancam margin</span> bisnis Anda:
-                        </p>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                            <div class="risk-item"><i data-lucide="droplets" class="w-4 h-4 text-blue-500"></i> Kualitas Baku Tidak Pasti</div>
-                            <div class="risk-item"><i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i> Kenaikan Tarif PDAM</div>
-                            <div class="risk-item"><i data-lucide="gauge" class="w-4 h-4 text-blue-500"></i> Pemangkasan Kuota ABT</div>
-                            <div class="risk-item"><i data-lucide="alert-circle" class="w-4 h-4 text-blue-500"></i> Beban Tarif Limbah WWTP</div>
-                        </div>
-
-                        <div class="p-8 bg-white text-slate-900 rounded-[2rem] shadow-sm border border-slate-200 transition-all hover:shadow-xl">
-                            <div class="relative z-10 space-y-6">
-                                <div>
-                                    <span class="text-blue-600 font-black text-xs uppercase tracking-[0.2em]">Zero-CapEx Solution</span>
-                                    <p class="text-base md:text-lg leading-relaxed mt-2">
-                                        Kebutuhan air industri menjadi layanan terukur dan ringan secara finansial—<span class="text-blue-600 font-bold">melindungi arus kas Anda.</span>
-                                    </p>
-                                </div>
-                                <div class="pt-4 border-t border-slate-100">
-                                    <div class="flex flex-wrap items-center gap-3 mb-4">
-                                        <div class="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-200 text-slate-600">Build</div>
-                                        <div class="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-200 text-slate-600">Finance</div>
-                                        <div class="px-3 py-1 bg-slate-50 rounded-full text-[9px] font-bold uppercase tracking-widest border border-slate-200 text-slate-600">Operate</div>
-                                    </div>
-                                    <p class="text-sm text-slate-500 leading-relaxed">
-                                        Invila™ membangun, membiayai, dan mengoperasikan sistem air Anda <span class="text-slate-900 font-bold italic underline decoration-blue-500 underline-offset-4">end-to-end</span>. Anda cukup membayar air yang digunakan.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(15,23,42,0.08);">
+                <div class="pill-row" aria-label="Delivery model">
+                  <span class="mini-pill">Build</span>
+                  <span class="mini-pill">Finance</span>
+                  <span class="mini-pill">Operate</span>
                 </div>
-
-                <div class="relative reveal active lg:block">
-                    <!-- VIDEO HERO -->
-                    <div class="rounded-[40px] overflow-hidden border-[8px] border-white shadow-2xl aspect-video bg-slate-900 relative">
-                        <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-80" poster="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000">
-                            <source src="Invila Landing Page Depan.mp4" type="video/mp4">
-                            <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000" alt="Invila Industrial">
-                        </video>
-                        <div class="absolute bottom-4 left-6 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                            <span class="text-[9px] font-bold text-white uppercase tracking-widest">DECN-IV™ System Live</span>
-                        </div>
-                    </div>
-                </div>
+                <p class="measure" style="margin: 0; font-size: 14px; color: var(--text-muted);">
+                  Invila™ membangun, membiayai, dan mengoperasikan sistem air Anda
+                  <strong style="color: var(--text); font-style: italic; text-decoration: underline; text-decoration-color: rgba(37,99,235,0.6); text-underline-offset: 4px;">
+                    end-to-end
+                  </strong>.
+                  Anda cukup membayar air yang digunakan.
+                </p>
+              </div>
             </div>
-        </div>
+          </div>
 
-        <!-- Marquee -->
-        <div class="mt-16 md:mt-24 border-y border-slate-100 py-6 md:py-10 bg-slate-50/50">
-            <div class="marquee-wrapper">
-                <div class="marquee-content" id="marqueeList">
-                    <!-- Dinamis akan diisi duplicate logo -->
-                </div>
+          <div class="reveal">
+            <div class="media-frame" aria-label="Invila industrial hero video">
+              <!-- NOTE: Keep video muted for autoplay compatibility; provide poster fallback. -->
+              <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000">
+                <source src="Invila Landing Page Depan.mp4" type="video/mp4" />
+                <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000" alt="Invila Industrial" />
+              </video>
+              <div class="media-live">
+                <span class="dot" aria-hidden="true"></span>
+                <span>DECN-IV™ System Live</span>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Marquee -->
+      <div class="marquee-wrap" aria-label="Trusted partners marquee">
+        <div class="container">
+          <div class="marquee-head">
+            <p class="marquee-title">Strategic ecosystem highlights</p>
+
+            <!-- WCAG 2.2.2: Provide mechanism to pause moving/scrolling content -->
+            <button class="marquee-toggle" id="marqueeToggle" type="button" aria-pressed="false">
+              <i data-lucide="pause" aria-hidden="true"></i>
+              Pause motion
+            </button>
+          </div>
+
+          <div class="marquee" id="marquee" data-paused="false">
+            <div class="marquee-track" id="marqueeList" aria-hidden="true">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- DNA SECTION -->
-    <section id="drives-us" class="py-24 md:py-32 bg-white overflow-hidden">
-        <div class="safe-container">
-            <div class="max-w-5xl mb-24 reveal">
-                <h2 class="text-blue-600 font-bold text-xs uppercase tracking-[0.4em] mb-6">Economics of Water</h2>
-                <h3 class="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] tracking-tighter mb-10 italic">
-                    Transformasi dari Utilitas <br>Menjadi Aset Strategis.
-                </h3>
-            </div>
-
-            <div class="grid lg:grid-cols-[1fr_1.2fr] gap-16 md:gap-20 items-center mb-24">
-                <div class="relative flex justify-center items-center h-[400px] md:h-[500px] reveal lg:order-1 order-2">
-                    <div class="animated-circle circle-1"></div>
-                    <div class="animated-circle circle-2"></div>
-                    <div class="animated-circle circle-3"></div>
-                    <div class="flex flex-col justify-center items-center w-full relative z-10">
-                        <div class="text-efficiency cycle-text">Efficiency</div>
-                        <div class="text-resilience cycle-text">Resilience</div>
-                        <div class="text-sustainability cycle-text">Sustainability</div>
-                    </div>
-                </div>
-
-                <div class="reveal lg:order-2 order-1">
-                    <div class="space-y-12">
-                        <div class="flex gap-6 group">
-                            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm"><i data-lucide="bar-chart-3" class="w-7 h-7"></i></div>
-                            <div>
-                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-xl italic">Efficiency</h4>
-                                <p class="text-base text-slate-500 mt-2 italic">Memastikan setiap liter air memberikan nilai maksimal.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-6 group">
-                            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><i data-lucide="shield-check" class="w-7 h-7"></i></div>
-                            <div>
-                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-xl italic">Resilience</h4>
-                                <p class="text-base text-slate-500 mt-2 italic">Membangun benteng operasional tangguh terhadap gangguan suplai.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-6 group">
-                            <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0 group-hover:bg-green-600 group-hover:text-white transition-all shadow-sm"><i data-lucide="leaf" class="w-7 h-7"></i></div>
-                            <div>
-                                <h4 class="font-black text-slate-900 uppercase tracking-tight text-xl italic">Sustainability</h4>
-                                <p class="text-base text-slate-500 mt-2 italic">Menyelaraskan profit dengan kelestarian alam.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STAT CIRCLES -->
-            <div class="flex flex-wrap md:flex-row gap-8 justify-center items-center reveal pt-12">
-                <div class="stat-circle text-slate-900 border-slate-100"><div class="text-3xl md:text-4xl font-black text-blue-600 italic">10+</div><div class="text-[8px] uppercase tracking-[0.2em] font-bold text-slate-400 mt-2 text-center">Years of<br>Stability</div></div>
-                <div class="stat-circle bg-blue-600 text-white border-blue-500"><div class="text-3xl md:text-4xl font-black italic">78.1</div><div class="text-[8px] uppercase tracking-[0.2em] font-bold opacity-80 mt-2 text-center">INSTALLED CAPACITY<br>MILLION m³/YEAR</div></div>
-                <div class="stat-circle bg-slate-900 text-white border-slate-800"><div class="text-3xl md:text-4xl font-black text-cyan-400 italic">ZERO</div><div class="text-[8px] uppercase tracking-[0.2em] font-bold opacity-60 mt-2 text-center">Capital<br>Risk [WaaS]</div></div>
-            </div>
+    <!-- DNA / ECONOMICS -->
+    <section id="drives-us" class="section" aria-label="Economics of water">
+      <div class="container">
+        <div class="dna-head reveal">
+          <h2>Economics of Water</h2>
+          <h3>Transformasi dari Utilitas <br />Menjadi Aset Strategis.</h3>
         </div>
+
+        <div class="dna-grid">
+          <div class="orbital reveal">
+            <div class="circle one" aria-hidden="true"></div>
+            <div class="circle two" aria-hidden="true"></div>
+            <div class="circle three" aria-hidden="true"></div>
+
+            <div class="cycle eff">Efficiency</div>
+            <div class="cycle res">Resilience</div>
+            <div class="cycle sus">Sustainability</div>
+          </div>
+
+          <div class="dna-features reveal">
+            <div class="feature">
+              <div class="feature-icon" aria-hidden="true"><i data-lucide="bar-chart-3"></i></div>
+              <div>
+                <h4>Efficiency</h4>
+                <p>Memastikan setiap liter air memberikan nilai maksimal.</p>
+              </div>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon" aria-hidden="true"><i data-lucide="shield-check"></i></div>
+              <div>
+                <h4>Resilience</h4>
+                <p>Membangun benteng operasional tangguh terhadap gangguan suplai.</p>
+              </div>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon" aria-hidden="true"><i data-lucide="leaf"></i></div>
+              <div>
+                <h4>Sustainability</h4>
+                <p>Menyelaraskan profit dengan kelestarian alam.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row reveal" aria-label="Key statistics">
+          <div class="stat-circle">
+            <div class="big">10+</div>
+            <div class="label">Years of<br />Stability</div>
+          </div>
+
+          <div class="stat-circle primary">
+            <div class="big">78.1</div>
+            <div class="label">INSTALLED CAPACITY<br />MILLION m³/YEAR</div>
+          </div>
+
+          <div class="stat-circle dark">
+            <div class="big">ZERO</div>
+            <div class="label">Capital<br />Risk [WaaS]</div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- CALCULATOR & CAPEX SECTION -->
-    <section id="audit" class="py-24 md:py-32 bg-[#020617] text-white font-jakarta relative">
-        <div class="safe-container">
-            <div class="max-w-4xl mb-20 reveal">
-                <h3 class="text-cyan-400 font-bold text-2xl md:text-3xl mb-8 tracking-tight uppercase">
-                    Invila™ Intelligence: <span class="font-light text-white">Saving Audit & Infrastructure Value</span>
-                </h3>
-                <div class="flex flex-col sm:flex-row gap-6 pt-4">
-                    <button onclick="downloadPDF()" id="btn-download" class="px-10 py-5 bg-rose-500 rounded-3xl text-xs font-bold uppercase tracking-widest shadow-2xl hover:bg-rose-600 transition-all flex items-center justify-center gap-4">
-                        <i data-lucide="file-text" class="w-5 h-5"></i> Download PDF
-                    </button>
-                    <button id="btn-update" class="px-10 py-5 bg-slate-800 text-slate-500 rounded-3xl text-xs font-bold uppercase tracking-widest cursor-not-allowed transition-all">Data Tersinkron</button>
-                </div>
-            </div>
+    <!-- AUDIT / CALCULATOR -->
+    <section id="audit" class="section audit" aria-label="Audit calculator">
+      <div class="container">
+        <div class="reveal">
+          <h3>
+            Invila™ Intelligence:
+            <span>Saving Audit &amp; Infrastructure Value</span>
+          </h3>
 
-            <div class="grid lg:grid-cols-[450px_1fr] gap-12 md:gap-20 reveal">
-                <!-- Inputs -->
-                <div class="glass-panel p-10 md:p-14 rounded-[4rem] space-y-10 border-white/5 h-fit">
-                    <div class="flex items-center gap-5 mb-4">
-                        <div class="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center text-slate-900 font-black text-xl shadow-lg">IV</div>
-                        <span class="text-xs font-black uppercase tracking-[0.3em]">Input Data</span>
-                    </div>
-                    <div class="grid gap-3">
-                        <label class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Debit (m³/hari)</label>
-                        <input type="text" id="input-flow" data-key="flowRate" class="input-comma w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 text-4xl font-black outline-none focus:border-cyan-400 transition-all" value="1,500">
-                    </div>
-                    <div class="grid gap-3">
-                        <label class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Legacy Cost (Rp/m³)</label>
-                        <input type="text" id="input-legacy" data-key="legacyCost" class="input-comma w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 text-4xl font-black outline-none focus:border-cyan-400 transition-all" value="14,600">
-                    </div>
-                    <div class="grid gap-3">
-                        <label class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Invila Tarif (Rp/m³)</label>
-                        <input type="text" id="input-tariff" data-key="invilaTariff" class="input-comma w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 text-4xl font-black text-cyan-400 outline-none focus:border-cyan-400 transition-all" value="5,500">
-                    </div>
-                </div>
+          <div class="audit-actions">
+            <button class="btn btn-primary" id="btn-download" type="button" onclick="downloadPDF()">
+              <i data-lucide="file-text" aria-hidden="true"></i>
+              Download PDF
+            </button>
 
-                <!-- Outputs -->
-                <div class="space-y-12">
-                    <!-- Saving Panel -->
-                    <div class="bg-gradient-to-br from-slate-900 to-black p-12 md:p-20 rounded-[5rem] border border-white/5 shadow-2xl relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 blur-[150px]"></div>
-                        <span class="text-blue-400 font-bold text-sm uppercase tracking-[0.5em]">Monthly Potential Saving</span>
-                        <h2 id="view-monthly-saving" class="text-5xl sm:text-7xl md:text-[90px] font-black tracking-tighter mt-12 leading-none italic">Rp 0</h2>
-                    </div>
-
-                    <!-- Capex & Yearly Panel -->
-                    <div class="grid sm:grid-cols-2 gap-8">
-                        <div class="glass-panel p-10 rounded-[3rem] border-white/5">
-                            <div class="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest">Annual Saving</div>
-                            <div id="view-annual-saving" class="text-2xl md:text-3xl font-black italic">Rp 0</div>
-                        </div>
-                        <div class="glass-panel p-10 rounded-[3rem] border-rose-500/20">
-                            <div class="text-[10px] uppercase font-bold text-rose-500 mb-3 tracking-widest">5-Year Strategy</div>
-                            <div id="view-five-year-saving" class="text-2xl md:text-3xl font-black text-rose-400 italic">Rp 0</div>
-                        </div>
-                    </div>
-
-                    <!-- CAPEX BY INVILA TM -->
-                    <div class="bg-gradient-to-br from-cyan-900/40 to-slate-900 p-12 rounded-[5rem] border border-cyan-500/30 shadow-2xl relative overflow-hidden reveal">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="p-2 bg-cyan-500/20 rounded-lg"><i data-lucide="zap" class="w-5 h-5 text-cyan-400"></i></div>
-                            <span class="text-cyan-400 font-bold text-sm uppercase tracking-[0.4em]">Capex by Invila™</span>
-                        </div>
-                        <p class="text-slate-400 text-sm mb-8 leading-relaxed">
-                            Berdasarkan standar investasi <span class="text-white font-bold">Rp. 360 Juta / LPS</span>, estimasi nilai infrastruktur Anda:
-                        </p>
-                        <div class="flex flex-col md:flex-row md:items-end gap-2 md:gap-6">
-                            <h2 id="view-capex-total" class="text-5xl md:text-7xl font-black tracking-tighter leading-none text-white italic">Rp 0</h2>
-                            <span class="text-slate-500 font-bold uppercase text-[10px] tracking-widest mb-1">Asset Valuation</span>
-                        </div>
-                        <div class="mt-8 pt-8 border-t border-white/10 flex justify-between items-center">
-                            <div class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Status: <span class="text-cyan-400">Zero-CapEx Eligible</span></div>
-                            <div class="flex gap-2">
-                                <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
-                                <div class="w-2 h-2 rounded-full bg-cyan-500/40"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Button becomes active when draft values differ from active values -->
+            <button class="btn btn-ghost" id="btn-update" type="button" aria-disabled="true" disabled>
+              Data Tersinkron
+            </button>
+          </div>
         </div>
+
+        <div class="audit-grid reveal">
+          <!-- Inputs -->
+          <div class="glass" aria-label="Input data panel">
+            <div class="panel-head">
+              <div class="panel-badge" aria-hidden="true">IV</div>
+              <p class="panel-title">Input Data</p>
+            </div>
+
+            <!-- NOTE: Using inputmode="numeric" to hint mobile virtual keyboard. -->
+            <div class="field">
+              <label for="input-flow">Debit (m³/hari)</label>
+              <input
+                id="input-flow"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                data-key="flowRate"
+                value="1.500"
+                aria-describedby="hint-flow"
+                pattern="[0-9.]*"
+              />
+              <div id="hint-flow" class="sr-only">Masukkan angka tanpa desimal.</div>
+            </div>
+
+            <div class="field">
+              <label for="input-legacy">Legacy Cost (Rp/m³)</label>
+              <input
+                id="input-legacy"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                data-key="legacyCost"
+                value="14.600"
+                pattern="[0-9.]*"
+              />
+            </div>
+
+            <div class="field">
+              <label for="input-tariff">Invila Tarif (Rp/m³)</label>
+              <input
+                id="input-tariff"
+                class="accent"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                data-key="invilaTariff"
+                value="5.500"
+                pattern="[0-9.]*"
+              />
+            </div>
+          </div>
+
+          <!-- Outputs -->
+          <div class="outputs" aria-label="Calculated outputs">
+            <div class="saving">
+              <div class="kicker">Monthly Potential Saving</div>
+              <!-- aria-live for screen reader updates (polite/not disruptive) -->
+              <div id="view-monthly-saving" class="value" aria-live="polite">Rp 0</div>
+            </div>
+
+            <div class="mini-boxes" aria-label="Summary savings">
+              <div class="mini">
+                <p class="label">Annual Saving</p>
+                <p id="view-annual-saving" class="num" aria-live="polite">Rp 0</p>
+              </div>
+              <div class="mini rose">
+                <p class="label" style="color: rgba(251,113,133,0.95);">5-Year Strategy</p>
+                <p id="view-five-year-saving" class="num" aria-live="polite">Rp 0</p>
+              </div>
+            </div>
+
+            <div class="capex reveal" aria-label="Capex valuation">
+              <div class="top">
+                <i data-lucide="zap" aria-hidden="true" style="color: rgba(34,211,238,0.95);"></i>
+                <span>Capex by Invila™</span>
+              </div>
+              <p>
+                Berdasarkan standar investasi <strong style="color:#fff;">Rp. 360 Juta / LPS</strong>,
+                estimasi nilai infrastruktur Anda:
+              </p>
+              <p id="view-capex-total" class="capex-value" aria-live="polite">Rp 0</p>
+
+              <div class="capex-footer">
+                <div>Status: <span class="status">Zero-CapEx Eligible</span></div>
+                <div aria-hidden="true" style="display:flex; gap:8px; align-items:center;">
+                  <span style="width:8px;height:8px;border-radius:999px;background:rgba(34,211,238,0.95); box-shadow:0 0 0 4px rgba(6,182,212,0.18);"></span>
+                  <span style="width:8px;height:8px;border-radius:999px;background:rgba(34,211,238,0.30);"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /audit-grid -->
+      </div>
     </section>
 
-    <!-- STRATEGIC DASHBOARD SECTION -->
-    <section id="portfolio" class="py-24 bg-slate-50 border-t border-slate-200">
-        <div class="safe-container space-y-8">
-            <!-- REKAM JEJAK STAT BOX -->
-            <div class="reveal">
-                <section class="stat-box rounded-3xl p-6 md:p-10 text-white shadow-2xl">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div class="shrink-0 flex items-center gap-4 border-r border-slate-700 pr-10 hidden md:flex">
-                            <i data-lucide="activity" size="24" class="text-blue-400"></i>
-                            <p class="text-[12px] font-black text-white uppercase tracking-[0.3em]">Rekam Jejak<br>Infrastruktur</p>
-                        </div>
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="section portfolio" aria-label="Portfolio dashboard">
+      <div class="container">
+        <div class="reveal">
+          <div class="stat-box">
+            <div class="stat-box-row">
+              <div class="stat-box-title" aria-hidden="true">
+                <i data-lucide="activity" style="color: rgba(96,165,250,0.95);"></i>
+                <p>Rekam Jejak<br />Infrastruktur</p>
+              </div>
 
-                        <div class="flex flex-wrap justify-center md:justify-end gap-8 md:gap-16 w-full">
-                            <div class="text-center md:text-left">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Debit Instan</p>
-                                <p class="text-3xl md:text-4xl font-black text-white leading-none mt-2"><span id="totalLPS">0</span> <span class="text-xs font-normal opacity-40">LPS</span></p>
-                            </div>
-                            <div class="text-center md:text-left border-slate-800 md:border-l md:pl-12">
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Volume /Bln</p>
-                                <p class="text-3xl md:text-4xl font-black text-white leading-none mt-2"><span id="totalMonthly">0</span> <span class="text-xs font-normal opacity-40">m³</span></p>
-                            </div>
-                            <div class="text-center md:text-left border-slate-800 md:border-l md:pl-12">
-                                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Volume /Thn</p>
-                                <p class="text-3xl md:text-4xl font-black text-emerald-400 leading-none mt-2"><span id="totalYearly">0</span> <span class="text-xs font-bold opacity-40 uppercase">Juta m³</span></p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- PROJECT GRID -->
-            <div class="space-y-6 reveal">
-                <div class="flex items-center gap-4 pt-10">
-                    <h2 class="text-sm font-black text-slate-900 uppercase tracking-[0.4em]">Detail Populasi Proyek</h2>
-                    <div class="h-[1.5px] flex-grow bg-slate-200"></div>
-                    <button onclick="restartDashboardAnimations()" class="p-2 rounded-full hover:bg-slate-200 transition-all text-slate-400">
-                        <i data-lucide="rotate-cw" size="16"></i>
-                    </button>
+              <div class="stat-metrics" aria-label="Portfolio totals">
+                <div class="metric">
+                  <p class="label">Debit Instan</p>
+                  <p class="val"><span id="totalLPS">0</span> <span class="unit">LPS</span></p>
                 </div>
 
-                <div id="projectGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Project Cards generated by JS -->
+                <div class="metric">
+                  <p class="label">Volume /Bln</p>
+                  <p class="val"><span id="totalMonthly">0</span> <span class="unit">m³</span></p>
                 </div>
+
+                <div class="metric emerald">
+                  <p class="label">Volume /Thn</p>
+                  <p class="val"><span id="totalYearly">0</span> <span class="unit">Juta m³</span></p>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+
+        <div class="portfolio-head reveal">
+          <h2>Detail Populasi Proyek</h2>
+          <div class="divider" aria-hidden="true"></div>
+          <button class="icon-btn" type="button" onclick="restartDashboardAnimations()" aria-label="Restart dashboard animations">
+            <i data-lucide="rotate-cw" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div id="projectGrid" class="projects reveal" aria-label="Project cards">
+          <!-- Generated by JS -->
+        </div>
+      </div>
     </section>
 
-    <!-- SUCCESS STORIES (VIDEOS) -->
-    <section id="success-stories" class="py-24 md:py-32 bg-white">
-        <div class="safe-container">
-            <div class="text-center mb-24 reveal">
-                <h2 class="text-blue-600 font-bold text-xs uppercase tracking-[0.5em] mb-6 text-center">Featured Projects</h2>
-                <h3 class="text-4xl md:text-7xl font-[900] text-slate-900 tracking-tighter italic text-center">Proven Performance.</h3>
-            </div>
-            <div class="grid md:grid-cols-2 gap-12">
-                <!-- PROJECT 1: VIDEO -->
-                <div class="group reveal">
-                    <div class="relative rounded-[48px] overflow-hidden bg-slate-100 aspect-[16/10] mb-8 shadow-lg">
-                        <video autoplay muted loop playsinline class="w-full h-full object-cover">
-                            <source src="KIW 1.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <h5 class="text-2xl font-black text-slate-900 mb-6 leading-tight uppercase italic">SCALABLE WAAS: KIW SEMARANG</h5>
-                </div>
-                <!-- PROJECT 2: VIDEO -->
-                <div class="group reveal" style="transition-delay: 0.1s;">
-                    <div class="relative rounded-[48px] overflow-hidden bg-slate-100 aspect-[16/10] mb-8 shadow-lg">
-                        <video autoplay muted loop playsinline class="w-full h-full object-cover">
-                            <source src="air minum kota medan.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <h5 class="text-2xl font-black text-slate-900 mb-6 leading-tight uppercase italic">AIR MINUM KOTA MEDAN (1.000 LPS)</h5>
-                </div>
-            </div>
+    <!-- SUCCESS STORIES -->
+    <section id="success-stories" class="section stories" aria-label="Success stories">
+      <div class="container">
+        <div class="center reveal">
+          <h2>Featured Projects</h2>
+          <h3>Proven Performance.</h3>
         </div>
+
+        <div class="story-grid">
+          <div class="story reveal" aria-label="Story 1">
+            <video autoplay muted loop playsinline>
+              <source src="KIW 1.mp4" type="video/mp4" />
+            </video>
+            <h5>SCALABLE WAAS: KIW SEMARANG</h5>
+          </div>
+
+          <div class="story reveal" aria-label="Story 2">
+            <video autoplay muted loop playsinline>
+              <source src="air minum kota medan.mp4" type="video/mp4" />
+            </video>
+            <h5>AIR MINUM KOTA MEDAN (1.000 LPS)</h5>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- STRATEGIC ECOSYSTEM -->
-    <section class="py-24 md:py-32 bg-slate-50 border-y border-slate-100">
-        <div class="safe-container">
-            <div class="text-center max-w-3xl mx-auto mb-16 md:mb-20 reveal">
-                <h2 class="text-blue-600 font-bold text-xs uppercase tracking-[0.5em] mb-4">Strategic Ecosystem</h2>
-                <h3 class="text-3xl md:text-5xl font-black text-slate-900 italic mb-6">Trusted by Industry Giants.</h3>
-            </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-10 items-center justify-items-center reveal logo-wall-grid" id="ecosystemGrid">
-                <!-- Ecosystem logos from JS -->
-            </div>
+    <section class="section ecosystem" aria-label="Strategic ecosystem">
+      <div class="container">
+        <div class="center eco-head reveal">
+          <h2>Strategic Ecosystem</h2>
+          <h3>Trusted by Industry Giants.</h3>
         </div>
+
+        <div id="ecosystemGrid" class="logo-wall reveal" aria-label="Ecosystem logos">
+          <!-- Filled by JS -->
+        </div>
+      </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-white py-24 border-t border-slate-100">
-        <div class="safe-container text-center">
-            <div class="text-3xl font-black tracking-tighter text-navy mb-10 uppercase italic">INVILA<sup class="text-blue-600 text-[12px] ml-1">TM</sup></div>
-            <p class="text-[11px] text-slate-500 font-bold uppercase tracking-[0.4em] mb-4">ENGINEERING BY INVILA ENGINEERING SYSTEMS</p>
-            <p class="text-[10px] text-slate-400 italic mb-8 uppercase tracking-tight max-w-md mx-auto">Tidak termasuk Populasi IPAL Puskesmas dan Rumah Sakit. Informasi bersifat rahasia dan strategis.</p>
-            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-[0.4em] italic">© 2026 Invila.asia | Strategic Infrastructure Group</p>
-        </div>
+    <footer class="footer" role="contentinfo">
+      <div class="container center">
+        <p class="brandline">INVILA<sup style="color: var(--primary); font-size: 12px; margin-left: 6px;">TM</sup></p>
+        <p>ENGINEERING BY INVILA ENGINEERING SYSTEMS</p>
+        <p class="note">
+          Tidak termasuk Populasi IPAL Puskesmas dan Rumah Sakit. Informasi bersifat rahasia dan strategis.
+        </p>
+        <p style="margin-top: 14px;">© 2026 Invila.asia | Strategic Infrastructure Group</p>
+      </div>
     </footer>
 
-    <!-- PDF TEMPLATE (HIDDEN) -->
-    <div style="position: absolute; top: -9999px; left: -9999px;">
-        <div id="pdf-template" style="width: 210mm; padding: 25mm; background: white; color: #0f172a; font-family: 'Inter', sans-serif;">
-            <div style="border-bottom: 3px solid #0f172a; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
-                <div>
-                    <div style="font-size: 8px; font-weight: 800; color: #3b82f6; letter-spacing: 2px; margin-bottom: 5px;">CONFIDENTIAL STRATEGIC REPORT</div>
-                    <h1 style="font-size: 24px; font-weight: 900; text-transform: uppercase;">Saving Audit & Capex Summary</h1>
-                </div>
-            </div>
-            <div style="margin-bottom: 40px;">
-                <div style="font-size: 10px; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">Monthly Potential Saving</div>
-                <div id="pdf-monthly-saving" style="font-size: 48px; font-weight: 900; color: #0f172a; letter-spacing: -2px; line-height: 1;">-</div>
-            </div>
-            <div style="background: #f8fafc; padding: 25px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
-                <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Estimated Asset Value (Capex)</div>
-                <div id="pdf-capex-val" style="font-size: 24px; font-weight: 900; color: #06b6d4;">-</div>
-            </div>
-            <div style="display: grid; grid-template-cols: 1fr 1fr; gap: 20px;">
-                <div style="background: #f1f5f9; padding: 20px; border-radius: 20px;">
-                    <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Penghematan Tahunan</div>
-                    <div id="pdf-annual-saving-p" style="font-size: 18px; font-weight: 900; color: #0f172a;">-</div>
-                </div>
-                <div style="background: #f1f5f9; padding: 20px; border-radius: 20px;">
-                    <div style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px;">Estimasi Debit LPS</div>
-                    <div id="pdf-lps-val" style="font-size: 18px; font-weight: 900; color: #2563eb;">-</div>
-                </div>
-            </div>
+    <!-- PDF TEMPLATE (HIDDEN / OFFSCREEN) -->
+    <!--
+      PDF EXPORT NOTE (TAINTED CANVAS):
+      If you add remote images/video into the captured #pdf-template area without CORS approval,
+      html2canvas may taint the canvas and exporting via toDataURL can fail.
+      Keep the captured template text-only, or ensure images are CORS-enabled. See MDN.
+    -->
+    <div style="position: fixed; left: -10000px; top: -10000px; width: 0; height: 0; overflow: hidden;">
+      <div id="pdf-template" style="width: 210mm; padding: 25mm; background: white; color: #0f172a; font-family: Inter, system-ui, sans-serif;">
+        <div style="border-bottom: 3px solid #0f172a; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <div style="font-size: 8px; font-weight: 800; color: #2563eb; letter-spacing: 2px; margin-bottom: 5px;">CONFIDENTIAL STRATEGIC REPORT</div>
+            <h1 style="font-size: 24px; font-weight: 900; text-transform: uppercase; margin: 0;">Saving Audit &amp; Capex Summary</h1>
+          </div>
         </div>
+
+        <div style="margin-bottom: 40px;">
+          <div style="font-size: 10px; color: #475569; text-transform: uppercase; margin-bottom: 10px;">Monthly Potential Saving</div>
+          <div id="pdf-monthly-saving" style="font-size: 48px; font-weight: 900; color: #0f172a; letter-spacing: -2px; line-height: 1;">-</div>
+        </div>
+
+        <div style="background: #f8fafc; padding: 25px; border-radius: 24px; border: 1px solid #e2e8f0; margin-bottom: 30px;">
+          <div style="font-size: 8px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Estimated Asset Value (Capex)</div>
+          <div id="pdf-capex-val" style="font-size: 24px; font-weight: 900; color: #06b6d4;">-</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div style="background: #f1f5f9; padding: 20px; border-radius: 20px;">
+            <div style="font-size: 8px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px;">Penghematan Tahunan</div>
+            <div id="pdf-annual-saving-p" style="font-size: 18px; font-weight: 900; color: #0f172a;">-</div>
+          </div>
+          <div style="background: #f1f5f9; padding: 20px; border-radius: 20px;">
+            <div style="font-size: 8px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 1px;">Estimasi Debit LPS</div>
+            <div id="pdf-lps-val" style="font-size: 18px; font-weight: 900; color: #2563eb;">-</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <script>
-        // --- DATA ---
-        const projects = [
-            { id: 1, name: "Clarifier 1 PDAM Tirtanadi Sunggal", category: "UPRATING", lps: 500, monthly: 1296000, yearly: 15552000, year: "2014", image: "Clarifier 1 PDAM Tirtanadi Sunggal.png" },
-            { id: 2, name: "Clarifier 6 PDAM Tirtanadi Sunggal", category: "BANGUN BARU", lps: 500, monthly: 1296000, yearly: 15552000, year: "2013", image: "Clarifier 6 PDAM Tirtanadi Sunggal.png" },
-            { id: 3, name: "WTP 300 LPS Tirta Asasta Legong", category: "UPRATING", lps: 300, monthly: 777600, yearly: 9331200, year: "2016", image: "WTP 300 LPS Tirta Asasta Legong.png" },
-            { id: 4, name: "WTP 300 LPS Tirta Asasta Citayam", category: "UPRATING", lps: 300, monthly: 777600, yearly: 9331200, year: "2016", image: "WTP 300 LPS Tirta Asasta Citayam.png" },
-            { id: 5, name: "SPAM Gunung Sari - Petro Kimia Gresik", category: "BANGUN BARU", lps: 833.3, monthly: 2160000, yearly: 25920000, year: "2016", image: "SPAM Gunung Sari - Petro Kimia Gresik.png" },
-            { id: 6, name: "SPAM I Kawasan Industri Wijayakusuma", category: "BANGUN BARU", lps: 50, monthly: 129600, yearly: 1555200, year: "2018", image: "SPAM I Kawasan Industri Wijayakusuma.png" },
-            { id: 7, name: "IPAL – IPA Kievit Indonesia Salatiga Plant", category: "BANGUN BARU", lps: 3, monthly: 7800, yearly: 93600, year: "2025", image: "IPAL – IPA Kievit Indonesia Salatiga Plant.png" },
-            { id: 8, name: "SPAM United Tractor - Patria Maritim Perkasa", category: "BANGUN BARU", lps: 1, monthly: 2592, yearly: 31104, year: "2025", image: "SPAM United Tractor - Patria Maritim Perkasa.png" },
-            { id: 9, name: "SPAM II KIW (Modular) WaaS", category: "ZEROCAPEX", lps: 25, monthly: 64800, yearly: 777600, year: "2026", image: "SPAM II KIW (Modular) WaaS.png" }
-        ];
+  <script>
+    // -----------------------------
+    // DATA (preserved from original)
+    // -----------------------------
+    const projects = [
+      { id: 1, name: "Clarifier 1 PDAM Tirtanadi Sunggal", category: "UPRATING", lps: 500, monthly: 1296000, yearly: 15552000, year: "2014", image: "Clarifier 1 PDAM Tirtanadi Sunggal.png" },
+      { id: 2, name: "Clarifier 6 PDAM Tirtanadi Sunggal", category: "BANGUN BARU", lps: 500, monthly: 1296000, yearly: 15552000, year: "2013", image: "Clarifier 6 PDAM Tirtanadi Sunggal.png" },
+      { id: 3, name: "WTP 300 LPS Tirta Asasta Legong", category: "UPRATING", lps: 300, monthly: 777600, yearly: 9331200, year: "2016", image: "WTP 300 LPS Tirta Asasta Legong.png" },
+      { id: 4, name: "WTP 300 LPS Tirta Asasta Citayam", category: "UPRATING", lps: 300, monthly: 777600, yearly: 9331200, year: "2016", image: "WTP 300 LPS Tirta Asasta Citayam.png" },
+      { id: 5, name: "SPAM Gunung Sari - Petro Kimia Gresik", category: "BANGUN BARU", lps: 833.3, monthly: 2160000, yearly: 25920000, year: "2016", image: "SPAM Gunung Sari - Petro Kimia Gresik.png" },
+      { id: 6, name: "SPAM I Kawasan Industri Wijayakusuma", category: "BANGUN BARU", lps: 50, monthly: 129600, yearly: 1555200, year: "2018", image: "SPAM I Kawasan Industri Wijayakusuma.png" },
+      { id: 7, name: "IPAL – IPA Kievit Indonesia Salatiga Plant", category: "BANGUN BARU", lps: 3, monthly: 7800, yearly: 93600, year: "2025", image: "IPAL – IPA Kievit Indonesia Salatiga Plant.png" },
+      { id: 8, name: "SPAM United Tractor - Patria Maritim Perkasa", category: "BANGUN BARU", lps: 1, monthly: 2592, yearly: 31104, year: "2025", image: "SPAM United Tractor - Patria Maritim Perkasa.png" },
+      { id: 9, name: "SPAM II KIW (Modular) WaaS", category: "ZEROCAPEX", lps: 25, monthly: 64800, yearly: 777600, year: "2026", image: "SPAM II KIW (Modular) WaaS.png" }
+    ];
 
-        const ecosystem = [
-            { name: "Wika", img: "wika.png", tag: "BUMN Infra" },
-            { name: "United Tractors", img: "united-tractors.png", tag: "Energy" },
-            { name: "Petrokimia", img: "petrokimia-gresik.png", tag: "Chemical" },
-            { name: "KIW", img: "kiw.png", tag: "Industrial Zone" },
-            { name: "Tirtanadi", img: "tirtanadi.png", tag: "Public Utility" },
-            { name: "Tirta Asasta", img: "tirta-asasta-depok.png", tag: "Water Services" },
-            { name: "Kievit", img: "kievit.png", tag: "Global Food" },
-            { name: "Patria", img: "patria-maritim-perkasa.png", tag: "Maritime" },
-            { name: "CSK", img: "cemerlang-samudra-kontrindo.png", tag: "Construction" },
-            { name: "Dinkes Depok", img: "dinkes depok.png", tag: "Health Sector" }
-        ];
+    const ecosystem = [
+      { name: "Wika", img: "wika.png", tag: "BUMN Infra" },
+      { name: "United Tractors", img: "united-tractors.png", tag: "Energy" },
+      { name: "Petrokimia", img: "petrokimia-gresik.png", tag: "Chemical" },
+      { name: "KIW", img: "kiw.png", tag: "Industrial Zone" },
+      { name: "Tirtanadi", img: "tirtanadi.png", tag: "Public Utility" },
+      { name: "Tirta Asasta", img: "tirta-asasta-depok.png", tag: "Water Services" },
+      { name: "Kievit", img: "kievit.png", tag: "Global Food" },
+      { name: "Patria", img: "patria-maritim-perkasa.png", tag: "Maritime" },
+      { name: "CSK", img: "cemerlang-samudra-kontrindo.png", tag: "Construction" },
+      { name: "Dinkes Depok", img: "dinkes depok.png", tag: "Health Sector" }
+    ];
 
-        // --- UTILS ---
-        function formatIDN(num) { return num.toLocaleString('id-ID'); }
-        function formatRp(v) {
-            const abs = Math.abs(v);
-            if (abs >= 1e9) return `Rp ${(v / 1e9).toFixed(2)} Miliar`;
-            if (abs >= 1e6) return `Rp ${(v / 1e6).toFixed(1)} Juta`;
-            return `Rp ${Math.round(v).toLocaleString("id-ID")}`;
-        }
+    // -----------------------------
+    // Intl formatters (id-ID)
+    // -----------------------------
+    const NF0 = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 });
+    const NF1 = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const NF2 = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // --- RENDER FUNCTIONS ---
-        function renderEcosystem() {
-            const grid = document.getElementById('ecosystemGrid');
-            const marquee = document.getElementById('marqueeList');
-            
-            const html = ecosystem.map(item => `
-                <div class="logo-pill">
-                    <img src="${item.img}" alt="${item.name}">
-                    <span class="pill-label">${item.tag}</span>
+    function formatIDN(num){
+      return NF0.format(num);
+    }
+
+    function formatRp(v){
+      const abs = Math.abs(v);
+
+      if (abs >= 1e9) return `Rp ${NF2.format(v / 1e9)} Miliar`;
+      if (abs >= 1e6) return `Rp ${NF1.format(v / 1e6)} Juta`;
+      return `Rp ${NF0.format(Math.round(v))}`;
+    }
+
+    // -----------------------------
+    // Render: ecosystem + marquee
+    // -----------------------------
+    function renderEcosystem(){
+      const grid = document.getElementById('ecosystemGrid');
+      const marquee = document.getElementById('marqueeList');
+
+      const html = ecosystem.map(item => `
+        <div class="logo-pill">
+          <img src="${item.img}" alt="${item.name}" loading="lazy" />
+          <span class="pill-label">${item.tag}</span>
+        </div>
+      `).join('');
+
+      grid.innerHTML = html;
+
+      // Double for seamless marquee scroll
+      marquee.innerHTML = html + html;
+    }
+
+    // -----------------------------
+    // Render: projects
+    // -----------------------------
+    function renderProjects(){
+      const grid = document.getElementById('projectGrid');
+      const repoName = "InvilaSmartUnitStrategicDashboardII";
+      const username = "invilawatertreatment-blip";
+
+      grid.innerHTML = projects.map(p => {
+        const badgeClass =
+          p.category === 'ZEROCAPEX' ? 'zero' :
+          p.category === 'UPRATING' ? 'up' : 'new';
+
+        const imgSrc = p.image
+          ? `https://raw.githubusercontent.com/${username}/${repoName}/main/${encodeURIComponent(p.image)}`
+          : null;
+
+        return `
+          <article class="project" aria-label="${p.name}">
+            <div class="project-top">
+              <span class="badge-mini ${badgeClass}">${p.category}</span>
+              <span class="est">EST. ${p.year}</span>
+            </div>
+
+            <h3>${p.name}</h3>
+
+            <div class="thumb" aria-label="Project image">
+              ${imgSrc ? `
+                <img
+                  src="${imgSrc}"
+                  alt="${p.name}"
+                  loading="lazy"
+                  onload="this.classList.add('is-loaded')"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"
+                />
+                <div class="thumb-fallback">
+                  <i data-lucide="image-off" aria-hidden="true"></i>
+                  <div style="margin-top:8px;">Foto Belum Tersedia</div>
                 </div>
-            `).join('');
-
-            grid.innerHTML = html;
-            marquee.innerHTML = html + html; // Double for marquee
-        }
-
-        function renderProjects() {
-            const grid = document.getElementById('projectGrid');
-            grid.innerHTML = projects.map(p => {
-                const badgeColor = p.category === 'ZEROCAPEX' ? 'bg-indigo-600 text-white' : 
-                                   p.category === 'UPRATING' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700';
-                
-                const repoName = "InvilaSmartUnitStrategicDashboardII";
-                const username = "invilawatertreatment-blip";
-                const imgSrc = p.image ? `https://raw.githubusercontent.com/${username}/${repoName}/main/${encodeURIComponent(p.image)}` : null;
-
-                return `
-                <div class="bg-white rounded-2xl p-4 card-industrial shadow-sm flex flex-col h-full">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[8px] font-black px-2 py-0.5 rounded border border-black/10 ${badgeColor}">${p.category}</span>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">EST. ${p.year}</span>
-                    </div>
-                    <h3 class="font-bold text-slate-900 text-[13px] leading-tight mb-4 h-8 overflow-hidden">${p.name}</h3>
-                    
-                    <div class="mb-4 border border-slate-200 rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center min-h-[160px] relative">
-                        <img src="${imgSrc}" alt="${p.name}" class="w-full h-40 object-cover transition-opacity duration-300 opacity-0" 
-                             onload="this.classList.remove('opacity-0')"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-100 text-slate-400 text-[10px] p-4 text-center">
-                            <i data-lucide="image-off" size="20" class="mb-2 opacity-50"></i>
-                            Foto Belum Tersedia
-                        </div>
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100 space-y-1.5 mt-auto">
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-bold uppercase text-[9px] tracking-tight">Debit (LPS)</span>
-                            <span class="font-black text-blue-600 text-sm">${p.lps}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-medium text-[9px] tracking-tight">Bulanan (m³)</span>
-                            <span class="font-bold text-slate-900 text-xs">${formatIDN(p.monthly)}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400 font-medium text-[9px] tracking-tight">Tahunan (m³)</span>
-                            <span class="text-slate-500 text-xs">${formatIDN(p.yearly)}</span>
-                        </div>
-                    </div>
+              ` : `
+                <div class="thumb-fallback" style="display:grid;">
+                  <i data-lucide="image-off" aria-hidden="true"></i>
+                  <div style="margin-top:8px;">Foto Belum Tersedia</div>
                 </div>
-                `;
-            }).join('');
-            lucide.createIcons();
+              `}
+            </div>
+
+            <div class="project-meta">
+              <div class="meta-row">
+                <span>Debit (LPS)</span>
+                <strong>${String(p.lps).replace('.', ',')}</strong>
+              </div>
+              <div class="meta-row">
+                <span>Bulanan (m³)</span>
+                <span style="font-weight:900; color: var(--text);">${formatIDN(p.monthly)}</span>
+              </div>
+              <div class="meta-row">
+                <span>Tahunan (m³)</span>
+                <span>${formatIDN(p.yearly)}</span>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      // Re-render icons inserted dynamically
+      if (window.lucide?.createIcons) window.lucide.createIcons();
+    }
+
+    // -----------------------------
+    // Motion controls: marquee pause
+    // -----------------------------
+    function initMarqueeControl(){
+      const marquee = document.getElementById('marquee');
+      const toggle = document.getElementById('marqueeToggle');
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // If user prefers reduced motion, start paused for safety.
+      if (reduceMotion){
+        marquee.dataset.paused = "true";
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.innerHTML = `<i data-lucide="play" aria-hidden="true"></i> Resume motion`;
+      }
+
+      toggle.addEventListener('click', () => {
+        const isPaused = marquee.dataset.paused === "true";
+        marquee.dataset.paused = isPaused ? "false" : "true";
+        toggle.setAttribute('aria-pressed', String(!isPaused));
+
+        toggle.innerHTML = isPaused
+          ? `<i data-lucide="pause" aria-hidden="true"></i> Pause motion`
+          : `<i data-lucide="play" aria-hidden="true"></i> Resume motion`;
+
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+      });
+    }
+
+    // -----------------------------
+    // Reveal animations using IntersectionObserver (performance-friendly)
+    // -----------------------------
+    function initReveal(){
+      const items = document.querySelectorAll('.reveal');
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduceMotion){
+        items.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
+
+      if (!('IntersectionObserver' in window)){
+        items.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
+
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries){
+          if (e.isIntersecting){
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
         }
+      }, { root: null, threshold: 0.15 });
 
-        // --- ANIMATIONS ---
-        function reveal() {
-            const reveals = document.querySelectorAll(".reveal");
-            const windowHeight = window.innerHeight;
-            reveals.forEach(el => {
-                const elementTop = el.getBoundingClientRect().top;
-                if (elementTop < windowHeight - 50) {
-                    el.classList.add("active");
-                }
-            });
-        }
+      items.forEach(el => io.observe(el));
+    }
 
-        function animateDashboardValues() {
-            animateValue("totalLPS", 2512.3, 1000);
-            animateValue("totalMonthly", 6511992, 1000);
-            animateValue("totalYearly", 78143904, 1200);
-        }
+    // -----------------------------
+    // Dashboard animated totals
+    // -----------------------------
+    function animateValue(id, end, duration){
+      const el = document.getElementById(id);
+      if (!el) return;
 
-        function animateValue(id, end, duration) {
-            const obj = document.getElementById(id);
-            if (!obj) return;
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const current = progress * end;
-                
-                if (id === 'totalLPS') {
-                    obj.innerText = current.toFixed(1).replace('.', ',');
-                } else if (id === 'totalYearly') {
-                    obj.innerText = (current / 1000000).toFixed(1).replace('.', ',');
-                } else {
-                    obj.innerText = formatIDN(Math.floor(current));
-                }
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion){
+        // No animation in reduced motion
+        if (id === 'totalLPS') el.textContent = end.toFixed(1).replace('.', ',');
+        else if (id === 'totalYearly') el.textContent = (end / 1_000_000).toFixed(1).replace('.', ',');
+        else el.textContent = formatIDN(Math.floor(end));
+        return;
+      }
 
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        }
+      let start = null;
+      function step(ts){
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / duration, 1);
+        const cur = p * end;
 
-        function restartDashboardAnimations() {
-            animateDashboardValues();
-        }
+        if (id === 'totalLPS') el.textContent = cur.toFixed(1).replace('.', ',');
+        else if (id === 'totalYearly') el.textContent = (cur / 1_000_000).toFixed(1).replace('.', ',');
+        else el.textContent = formatIDN(Math.floor(cur));
 
-        // --- CALCULATOR & CAPEX LOGIC ---
-        const CONFIG = { flowRate: 1500, legacyCost: 14600, invilaTariff: 5500, capexPerLPS: 360000000 };
-        let activeValues = { ...CONFIG };
-        let draftValues = { ...CONFIG };
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
 
-        const updateUI = () => {
-            const monthly = (activeValues.legacyCost - activeValues.invilaTariff) * activeValues.flowRate * 30;
-            const annual = monthly * 12;
-            const fiveYear = annual * 5;
+    function animateDashboardValues(){
+      animateValue("totalLPS", 2512.3, 900);
+      animateValue("totalMonthly", 6511992, 900);
+      animateValue("totalYearly", 78143904, 1100);
+    }
 
-            // Debit m3/day to LPS (1 LPS = 86.4 m3/day)
-            const lpsEstimate = activeValues.flowRate / 86.4;
-            const capexTotal = lpsEstimate * activeValues.capexPerLPS;
+    function restartDashboardAnimations(){
+      animateDashboardValues();
+    }
 
-            document.getElementById('view-monthly-saving').innerText = formatRp(monthly);
-            document.getElementById('view-annual-saving').innerText = formatRp(annual);
-            document.getElementById('view-five-year-saving').innerText = formatRp(fiveYear);
-            document.getElementById('view-capex-total').innerText = formatRp(capexTotal);
+    // -----------------------------
+    // Calculator logic (preserved)
+    // -----------------------------
+    const CONFIG = { flowRate: 1500, legacyCost: 14600, invilaTariff: 5500, capexPerLPS: 360000000 };
+    let activeValues = { ...CONFIG };
+    let draftValues = { ...CONFIG };
 
-            // PDF Data
-            document.getElementById('pdf-monthly-saving').innerText = formatRp(monthly);
-            document.getElementById('pdf-annual-saving-p').innerText = formatRp(annual);
-            document.getElementById('pdf-capex-val').innerText = formatRp(capexTotal);
-            document.getElementById('pdf-lps-val').innerText = lpsEstimate.toFixed(2) + " LPS";
-            
-            const isDirty = JSON.stringify(draftValues) !== JSON.stringify(activeValues);
-            const btn = document.getElementById('btn-update');
-            if (isDirty) {
-                btn.classList.replace('bg-slate-800', 'bg-cyan-400');
-                btn.classList.replace('text-slate-500', 'text-black');
-                btn.classList.remove('cursor-not-allowed');
-                btn.innerText = "Perbarui Hasil";
-            } else {
-                btn.classList.replace('bg-cyan-400', 'bg-slate-800');
-                btn.classList.replace('text-black', 'text-slate-500');
-                btn.classList.add('cursor-not-allowed');
-                btn.innerText = "Data Tersinkron";
-            }
-        };
+    function parseIDNInteger(text){
+      // Keep digits only. (We display grouping '.' but strip everything anyway.)
+      const digits = String(text).replace(/\D/g, '');
+      return digits ? parseInt(digits, 10) : 0;
+    }
 
-        // --- PDF DOWNLOAD ---
-        async function downloadPDF() {
-            const btn = document.getElementById('btn-download');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> GENERATING...`;
-            try {
-                const template = document.getElementById('pdf-template');
-                template.parentElement.style.position = 'static';
-                const canvas = await html2canvas(template, { scale: 2 });
-                template.parentElement.style.position = 'absolute';
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF("p", "mm", "a4");
-                pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
-                pdf.save(`Invila-Strategic-Report-${Date.now()}.pdf`);
-            } catch(e) {
-                console.error(e);
-            } finally {
-                btn.innerHTML = `<i data-lucide="file-text" class="w-5 h-5"></i> Download PDF`;
-                lucide.createIcons();
-            }
-        }
+    function setUpdateButtonState(){
+      const btn = document.getElementById('btn-update');
+      const isDirty = JSON.stringify(draftValues) !== JSON.stringify(activeValues);
 
-        // --- INIT ---
-        window.addEventListener("scroll", reveal);
+      if (isDirty){
+        btn.disabled = false;
+        btn.setAttribute('aria-disabled', 'false');
+        btn.classList.remove('btn-ghost');
+        btn.classList.add('btn-update');
+        btn.textContent = "Perbarui Hasil";
+      } else {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+        btn.classList.remove('btn-update');
+        btn.classList.add('btn-ghost');
+        btn.textContent = "Data Tersinkron";
+      }
+    }
 
-        document.querySelectorAll('.input-comma').forEach(input => {
-            input.addEventListener('input', (e) => {
-                const key = e.target.dataset.key;
-                const numeric = e.target.value.replace(/\D/g, "");
-                draftValues[key] = numeric ? parseInt(numeric) : 0;
-                e.target.value = draftValues[key].toLocaleString("en-US");
-                updateUI();
-            });
+    function updateUI(){
+      const monthly = (activeValues.legacyCost - activeValues.invilaTariff) * activeValues.flowRate * 30;
+      const annual = monthly * 12;
+      const fiveYear = annual * 5;
+
+      // Debit m3/day to LPS (1 LPS = 86.4 m3/day)
+      const lpsEstimate = activeValues.flowRate / 86.4;
+      const capexTotal = lpsEstimate * activeValues.capexPerLPS;
+
+      document.getElementById('view-monthly-saving').innerText = formatRp(monthly);
+      document.getElementById('view-annual-saving').innerText = formatRp(annual);
+      document.getElementById('view-five-year-saving').innerText = formatRp(fiveYear);
+      document.getElementById('view-capex-total').innerText = formatRp(capexTotal);
+
+      // PDF values
+      document.getElementById('pdf-monthly-saving').innerText = formatRp(monthly);
+      document.getElementById('pdf-annual-saving-p').innerText = formatRp(annual);
+      document.getElementById('pdf-capex-val').innerText = formatRp(capexTotal);
+      document.getElementById('pdf-lps-val').innerText = lpsEstimate.toFixed(2).replace('.', ',') + " LPS";
+
+      setUpdateButtonState();
+    }
+
+    // -----------------------------
+    // PDF download
+    // -----------------------------
+    async function downloadPDF(){
+      const btn = document.getElementById('btn-download');
+      const old = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" aria-hidden="true" style="animation: spin 1.2s linear infinite;"></i> GENERATING...`;
+      if (window.lucide?.createIcons) window.lucide.createIcons();
+
+      try{
+        // Ensure fonts are ready before rendering (best effort).
+        if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+        const template = document.getElementById('pdf-template');
+
+        // IMPORTANT: Keep the template free from cross-origin images/videos unless CORS-enabled,
+        // otherwise canvas export can fail due to "tainted canvas".
+        const canvas = await html2canvas(template, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          allowTaint: false
         });
 
-        document.getElementById('btn-update').addEventListener('click', () => {
-            activeValues = { ...draftValues };
-            updateUI();
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 210, 297);
+        pdf.save(`Invila-Strategic-Report-${Date.now()}.pdf`);
+      } catch (e){
+        console.error(e);
+        alert("PDF generation failed. Check console for details.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = old;
+        if (window.lucide?.createIcons) window.lucide.createIcons();
+      }
+    }
+
+    // -----------------------------
+    // Inputs (id-ID formatting)
+    // -----------------------------
+    function initInputs(){
+      document.querySelectorAll('input[data-key]').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const key = e.target.dataset.key;
+          const n = parseIDNInteger(e.target.value);
+          draftValues[key] = n;
+          e.target.value = NF0.format(n); // id-ID grouping
+          setUpdateButtonState();
+          // update outputs live with draft preview
+          // (But keep active values until user commits)
+          const snapshot = { ...activeValues };
+          activeValues = { ...draftValues };
+          updateUI();
+          activeValues = snapshot;
         });
 
-        window.onload = () => { 
-            renderEcosystem(); 
-            renderProjects(); 
-            reveal(); 
-            updateUI(); 
-            animateDashboardValues();
-            lucide.createIcons(); 
-        };
-    </script>
+        // Normalize initial formatting
+        const n0 = parseIDNInteger(input.value);
+        input.value = NF0.format(n0);
+      });
+
+      document.getElementById('btn-update').addEventListener('click', () => {
+        activeValues = { ...draftValues };
+        updateUI();
+      });
+    }
+
+    // -----------------------------
+    // Mobile nav toggle
+    // -----------------------------
+    function initNav(){
+      const toggle = document.getElementById('navToggle');
+      const panel = document.getElementById('primaryNavMobile');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        panel.hidden = expanded;
+      });
+
+      // Close panel after click
+      panel.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          toggle.setAttribute('aria-expanded', 'false');
+          panel.hidden = true;
+        });
+      });
+    }
+
+    // -----------------------------
+    // Init
+    // -----------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      renderEcosystem();
+      renderProjects();
+      initMarqueeControl();
+      initReveal();
+      initInputs();
+      initNav();
+      updateUI();
+      animateDashboardValues();
+
+      if (window.lucide?.createIcons) window.lucide.createIcons();
+    });
+  </script>
+
+  <style>
+    /* Small inline keyframes for loader icon (used in JS innerHTML) */
+    @keyframes spin { from{ transform: rotate(0deg);} to{ transform: rotate(360deg);} }
+  </style>
 </body>
 </html>
